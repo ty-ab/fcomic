@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "99064353723",
+    "firebase_url": "https://fcomic-3fc3e-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "fcomic-3fc3e",
+    "storage_bucket": "fcomic-3fc3e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:99064353723:android:bcdbc670acb27a5cfe6a9e",
+        "android_client_info": {
+          "package_name": "com.example.fcomic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaw3Ld3ggaGfp2HBVuxgmlcMCDdYkzc2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
