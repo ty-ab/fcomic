@@ -1,13 +1,16 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final FirebaseApp app = await Firebase.initializeApp(
-    name: 'fcomic_android',
+    name: 'fcomic',
     options:
         Platform.isMacOS || Platform.isIOS
             ? FirebaseOptions(
@@ -31,8 +34,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  FirebaseApp app;
-  MyApp({super.key, required this.app});
+  final FirebaseApp app;
+  const MyApp({super.key, required this.app});
 
   // This widget is the root of your application.
   @override
@@ -42,21 +45,35 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Comic Reader', app: app),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title, required this.app});
 
   final String title;
+
+  final FirebaseApp app;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late DatabaseReference bannerRef;
+
+  @override
+  void initState() {
+    super.initState();
+    final FirebaseDatabase _db = FirebaseDatabase.instance;
+    bannerRef = _db.ref('Banners');
+    getBanner(bannerRef).then((bannerList) {
+      print("Banner List: $bannerList");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,9 +82,69 @@ class _MyHomePageState extends State<MyHomePage> {
 
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
+      body: FutureBuilder<List<String>>(
+        future: getBanner(bannerRef),
+        builder: (context, snapshot) {
+          // snapshot.data?.map((e)=>{debugPrint("LOG:${(e)}")});
+          if (snapshot.hasData) {
+            // debugPrint("LOG:${snapshot.data?.last}");
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CarouselSlider(
+                  items:
+                      snapshot.data
+                          ?.map(
+                            (toElement) => Builder(
+                              builder: (context) {
+                                return Image.network(
+                                  toElement,
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
+                          )
+                          .toList(),
+                  options: CarouselOptions(
+                    autoPlay: true,
+                    animateToClosest: true,
+                    enlargeCenterPage: true,
+                    initialPage: 0,
+                    height: MediaQuery.of(context).size.height / 3,
+                  ),
+                ),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Image.network(
+                "https://tinypng.com/static/images/george-anim/large_george_x2.webp",
+                fit: BoxFit.cover,
+              ),
+            );
+          }
+          return Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
+
+  Future<List<String>> getBanner(DatabaseReference bannerRef) async {
+    debugPrint("LOG:HEY");
+
+    final event = await bannerRef.once();
+    final snapshot = event.snapshot;
+    final data = snapshot.value;
+
+    if (data is List) {
+      data.map((e)=>debugPrint("LOG:$e"));
+      return data.cast<String>().toList();
+    }
+    debugPrint("LOG:${data is List}");
+
+    return [];
+    // return bannerRef.once().then((snapshot)=>snapshot.value.cast<String>().toList());
+  }
+
 }
