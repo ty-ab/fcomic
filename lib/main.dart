@@ -7,6 +7,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'ds_imageloder.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final FirebaseApp app = await Firebase.initializeApp(
@@ -96,10 +98,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   items:
                       snapshot.data
                           ?.map(
-                            (toElement) => Builder(
+                            (element) => Builder(
                               builder: (context) {
-                                return Image.network(
-                                  toElement,
+                                return CustomImage(
+                                  imageUrl: element,
                                   fit: BoxFit.cover,
                                 );
                               },
@@ -111,8 +113,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     animateToClosest: true,
                     enlargeCenterPage: true,
                     initialPage: 0,
-                    height: MediaQuery.of(context).size.height / 3,
+                    height: MediaQuery.of(context).size.height / 4,
+
                   ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Container(
+                        color: Color(0xFFA89ACF),
+                        child: Padding(padding: const EdgeInsets.all(8),child: Text("New Comic",style: TextStyle(color: Colors.white),),),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -138,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final data = snapshot.value;
 
     if (data is List) {
-      data.map((e)=>debugPrint("LOG:$e"));
+      data.map((e) => debugPrint("LOG:$e"));
       return data.cast<String>().toList();
     }
     debugPrint("LOG:${data is List}");
@@ -146,5 +160,4 @@ class _MyHomePageState extends State<MyHomePage> {
     return [];
     // return bannerRef.once().then((snapshot)=>snapshot.value.cast<String>().toList());
   }
-
 }

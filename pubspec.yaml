@@ -38,6 +38,8 @@ dependencies:
   firebase_core: any
   carousel_slider: any
   flutter_riverpod: any
+  shimmer: any
+  cached_network_image: any
 
 
 dev_dependencies:
