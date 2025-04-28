@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:fcomic/rounded_row.dart';
+import 'package:fcomic/skeleton-image-widget.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +45,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Comic',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
@@ -65,12 +67,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late DatabaseReference bannerRef;
+  late DatabaseReference comicRef;
 
   @override
   void initState() {
     super.initState();
     final FirebaseDatabase _db = FirebaseDatabase.instance;
     bannerRef = _db.ref('Banners');
+    comicRef = _db.ref('Comic');
     getBanner(bannerRef).then((bannerList) {
       print("Banner List: $bannerList");
     });
@@ -100,9 +104,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           ?.map(
                             (element) => Builder(
                               builder: (context) {
-                                return CustomImage(
-                                  imageUrl: element,
-                                  fit: BoxFit.cover,
+                                return Padding(
+                                  padding: EdgeInsets.all(5),
+                                  child: CustomImage(
+                                    imageUrl: element,
+                                    fit: BoxFit.cover,
+                                    borderRadius: 12,
+                                    skeletonBaseColor: Colors.blueGrey[100]!,
+                                    skeletonHighlightColor:
+                                        Colors.blueGrey[50]!,
+                                    fadeInDuration: Duration(seconds: 1),
+                                  ),
                                 );
                               },
                             ),
@@ -111,10 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   options: CarouselOptions(
                     autoPlay: true,
                     animateToClosest: true,
-                    enlargeCenterPage: true,
                     initialPage: 0,
                     height: MediaQuery.of(context).size.height / 4,
-
                   ),
                 ),
                 Row(
@@ -122,18 +132,62 @@ class _MyHomePageState extends State<MyHomePage> {
                     Expanded(
                       flex: 4,
                       child: Container(
-                        color: Color(0xFFA89ACF),
-                        child: Padding(padding: const EdgeInsets.all(8),child: Text("New Comic",style: TextStyle(color: Colors.white),),),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFA89ACF),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(5),
+                            bottomLeft: Radius.circular(5),
+                          ),
+                        ),
+                        margin: EdgeInsets.only(left: 5),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text("New Comics"),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Color(0x34252533),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(5),
+                            bottomRight: Radius.circular(5),
+                          ),
+                        ),
+                        margin: EdgeInsets.only(right: 5),
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text(''),
+                        ),
                       ),
                     ),
                   ],
+                ),
+                FutureBuilder(
+                  future: getComic(comicRef),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Center(
+                        child: Text('data:${snapshot.data?.first}'),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(
+                        child: Text('data has error:${snapshot.hasError}'),
+                      );
+                    } else {
+                      return CircularProgressIndicator();
+                    }
+                  },
                 ),
               ],
             );
           } else if (snapshot.hasError) {
             return Center(
-              child: Image.network(
-                "https://tinypng.com/static/images/george-anim/large_george_x2.webp",
+              child: SkeletonImageLoader(
+                imageUrl:
+                    'https://tinypng.com/static/images/george-anim/large_george_x2.webp',
                 fit: BoxFit.cover,
               ),
             );
@@ -148,6 +202,23 @@ class _MyHomePageState extends State<MyHomePage> {
     debugPrint("LOG:HEY");
 
     final event = await bannerRef.once();
+    final snapshot = event.snapshot;
+    final data = snapshot.value;
+
+    if (data is List) {
+      data.map((e) => debugPrint("LOG:$e"));
+      return data.cast<String>().toList();
+    }
+    debugPrint("LOG:${data is List}");
+
+    return [];
+    // return bannerRef.once().then((snapshot)=>snapshot.value.cast<String>().toList());
+  }
+
+  Future<List<String>> getComic(DatabaseReference comicRef) async {
+    debugPrint("LOG:HEY");
+
+    final event = await comicRef.once();
     final snapshot = event.snapshot;
     final data = snapshot.value;
 
