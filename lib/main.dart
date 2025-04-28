@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:fcomic/model/comic.dart';
 import 'package:fcomic/skeleton-image-widget.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -77,6 +79,10 @@ class _MyHomePageState extends State<MyHomePage> {
     getBanner(bannerRef).then((bannerList) {
       print("Banner List: $bannerList");
     });
+
+    getComic(comicRef).then((comicList) {
+      print("COMICS:${comicList}");
+    });
   }
 
   @override
@@ -127,6 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+
                   children: [
                     Expanded(
                       flex: 4,
@@ -167,13 +176,52 @@ class _MyHomePageState extends State<MyHomePage> {
                 FutureBuilder(
                   future: getComic(comicRef),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                    if (snapshot.hasError) {
                       return Center(
-                        child: Text('data:${snapshot.data?.first}'),
+                        child: Text('data has error :${snapshot.hasError}'),
                       );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Text('data has error:${snapshot.hasError}'),
+                    } else if (snapshot.hasData) {
+                      List<Comics> comics = List<Comics>.empty(
+                        growable: true,
+                      );
+                      snapshot.data?.forEach((item){
+                        var comic = Comics.fromJson(jsonDecode(jsonEncode(item)));
+                        comics.add(comic);
+                      });
+                      /*
+                      for (var item in snapshot.data!) {
+                        var comic = Comics.fromJson(
+                          json.decode(json.decode(item)),
+                        );
+                        comics.add(comic);
+                      }
+                      */
+                      return Expanded(
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.8,
+                          padding: const EdgeInsets.all(4.0),
+                          mainAxisSpacing: 1.0,
+                          crossAxisSpacing: 1.0,
+                          children:
+                              comics.map((comic) {
+                                return GestureDetector(
+                                  onTap: () {},
+                                  child: Card(
+                                    elevation: 12,
+                                    child: Stack(
+                                      fit: StackFit.expand,
+                                      children: [
+                                        CustomImage(
+                                          imageUrl: comic.image!,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                        ),
                       );
                     } else {
                       return CircularProgressIndicator();
@@ -214,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // return bannerRef.once().then((snapshot)=>snapshot.value.cast<String>().toList());
   }
 
-  Future<List<String>> getComic(DatabaseReference comicRef) async {
+  Future<List<dynamic>?> getComic(DatabaseReference comicRef) async {
     debugPrint("LOG:HEY");
 
     final event = await comicRef.once();
@@ -223,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (data is List) {
       data.map((e) => debugPrint("LOG:$e"));
-      return data.cast<String>().toList();
+      return data?.cast<dynamic>().toList();
     }
     debugPrint("LOG:${data is List}");
 

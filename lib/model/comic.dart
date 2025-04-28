@@ -2,18 +2,18 @@
 import 'chapter.dart';
 
 class Comics {
-  late String category,name,image;
-  late List<Chapters> chapter;
+   String? category,name,image;
+   late List<Chapters> chapter;
 
-  Comics( this.category,  this.name,  this.image,  this.chapter);
+  Comics(this.category,  this.name,  this.image,  this.chapter);
   Comics.fromJson(Map<String,dynamic> json){
     category = json['Category'];
     if(json['Chapters']!=null) {
       chapter = List<Chapters>.empty(growable: true);
+      json['Chapters'].forEach((element){
+        chapter.add(Chapters.fromJson(element));
+      });
     }
-    json['Chapters'].forEach((element){
-      chapter.add(Chapters.fromJson(element));
-    });
     image = json['Image'];
     name = json['Name'];
   }

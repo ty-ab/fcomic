@@ -6,7 +6,7 @@ class Chapters {
 
   Chapters.fromJson(Map<String,dynamic> json){
     if(json['Links']!=null)links=json['Links'].cast<String>();
-    name = json['name'];
+    name = json['Name'];
   }
 
   Map<String,dynamic> toJson(){
