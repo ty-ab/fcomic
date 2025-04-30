@@ -1,16 +1,38 @@
-# fcomic
+# 📚 Flutter Comic Reader
 
-A new Flutter project.
+A feature-rich comic reader app built with Flutter, showcasing modern app development practices.
 
-## Getting Started
+![App Screenshot](screenshot.png) <!-- Replace with actual screenshot path -->
 
-This project is a starting point for a Flutter application.
+## ✨ Features
+- **Immersive Reading**
+    - Page-turning animations
+    - Reading progress tracking
+    - ~~Zoomable comic panels~~
 
-A few resources to get you started if this is your first Flutter project:
+- **State Management**
+    - Riverpod implementation
+    - ~~Offline-first architecture
+    - Favorite comics bookmarking~~
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠 Tech Stack
+| Category          | Technologies                  |
+|-------------------|-------------------------------|
+| Framework         | Flutter 3.x (Null Safety)     |
+| State Management  | Riverpod 2.0                  |
+| Image Handling    | CachedNetworkImage, Shimmer   |
+| Analytics         | Firebase Analytics (Optional) |
+
+
+
+## 🚀 Getting Started
+```bash
+# 1. Clone repository
+git clone https://github.com/yourusername/flutter-comic-reader.git
+
+# 2. Install dependencies
+flutter pub get
+
+# 3. Run development build
+flutter run
