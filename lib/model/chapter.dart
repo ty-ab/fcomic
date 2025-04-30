@@ -1,6 +1,6 @@
 class Chapters {
-  late List<String> links;
-  late String name;
+  List<String>? links;
+  String? name;
 
   Chapters({required this.links, required this.name});
 

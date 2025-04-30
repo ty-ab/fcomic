@@ -5,7 +5,9 @@ class Comics {
    String? category,name,image;
    late List<Chapters> chapter;
 
+
   Comics(this.category,  this.name,  this.image,  this.chapter);
+
   Comics.fromJson(Map<String,dynamic> json){
     category = json['Category'];
     if(json['Chapters']!=null) {

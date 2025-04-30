@@ -4,13 +4,14 @@ import 'dart:io';
 
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fcomic/model/comic.dart';
-import 'package:fcomic/skeleton-image-widget.dart';
+import 'package:fcomic/screen/chapter_screen.dart';
+import 'package:fcomic/state/state_manager.dart';
+import 'package:fcomic/widget/skeleton-image-widget.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'ds_imageloder.dart';
+import 'widget/ds_imageloder.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Comic',
+      routes: {'/chapters': (context) => ChapterScreen()},
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
@@ -206,7 +208,15 @@ class _MyHomePageState extends State<MyHomePage> {
                           children:
                               comics.map((comic) {
                                 return GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    final container = ProviderScope.containerOf(
+                                      context,
+                                    );
+                                    container
+                                        .read(comicSelected.notifier)
+                                        .state = comic;
+                                    Navigator.pushNamed(context, "/chapters");
+                                  },
                                   child: Card(
                                     elevation: 12,
                                     child: Stack(
@@ -297,7 +307,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (data is List) {
       data.map((e) => debugPrint("LOG:$e"));
-      return data?.cast<dynamic>().toList();
+      return data.cast<dynamic>().toList();
     }
     debugPrint("LOG:${data is List}");
 
