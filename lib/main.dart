@@ -181,11 +181,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text('data has error :${snapshot.hasError}'),
                       );
                     } else if (snapshot.hasData) {
-                      List<Comics> comics = List<Comics>.empty(
-                        growable: true,
-                      );
-                      snapshot.data?.forEach((item){
-                        var comic = Comics.fromJson(jsonDecode(jsonEncode(item)));
+                      List<Comics> comics = List<Comics>.empty(growable: true);
+                      snapshot.data?.forEach((item) {
+                        var comic = Comics.fromJson(
+                          jsonDecode(jsonEncode(item)),
+                        );
                         comics.add(comic);
                       });
                       /*
@@ -215,6 +215,32 @@ class _MyHomePageState extends State<MyHomePage> {
                                         CustomImage(
                                           imageUrl: comic.image!,
                                           fit: BoxFit.cover,
+                                        ),
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              color: Color(0x4C4343B0),
+                                              padding: const EdgeInsets.all(8),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${comic.name}',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
